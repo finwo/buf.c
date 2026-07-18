@@ -16,3 +16,6 @@ tests: $(TESTS) ${TESTS:=.c}
 .PHONY: clean
 clean:
 	rm -f $(TESTS)
+
+README.md: src/buf.h
+	stddoc < src/buf.h > README.md
