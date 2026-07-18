@@ -1,0 +1,4 @@
+/.cache/
+*.o
+/lib/
+/compile_commands.json
