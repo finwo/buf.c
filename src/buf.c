@@ -25,14 +25,12 @@ const char *error_messages[] = {
   "Unknown error",
   "Missing subject",
   "Missing source",
-  "Negative length",
 };
 
 #define BUF_ERRNO_UNKNOWN         -1
 #define BUF_ERRNO_OK               0
 #define BUF_ERRNO_MISSING_SUBJECT  1
 #define BUF_ERRNO_MISSING_SOURCE   2
-#define BUF_ERRNO_NEGATIVE_LENGTH  3
 
 static void *(*_realloc)(void* ptr,size_t size) = realloc;
 static void (*_free)(void* ptr) = free;
@@ -48,7 +46,7 @@ const char *buf_error(int errno) {
   if (!errno) return NULL;
 
   // Known error
-  if ((errno > 0) && (errno < ARRAY_SIZE(error_messages))) {
+  if ((errno > 0) && ((size_t)errno < ARRAY_SIZE(error_messages))) {
     return error_messages[errno];
   }
 
@@ -59,7 +57,6 @@ const char *buf_error(int errno) {
 int buf_append(struct buf *subject, const char *source, const size_t length) {
   if (!subject) return BUF_ERRNO_MISSING_SUBJECT;
   if (!source) return BUF_ERRNO_MISSING_SOURCE;
-  if (length < 0) return BUF_ERRNO_NEGATIVE_LENGTH;
 
   // Initial alloc if blank buffer
   if (!subject->alloc) {
