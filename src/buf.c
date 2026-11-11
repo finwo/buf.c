@@ -79,9 +79,9 @@ int buf_append(struct buf *subject, const char *source, const size_t length) {
     subject->dat  = subject->alloc;
   }
 
-  // Grow buffer if still not enough space
+  // Grow buffer if still not enough space: double, but never less than needed
   if ((subject->len + length) > subject->cap) {
-    subject->cap   = MAX(32, subject->cap * 2);
+    subject->cap   = MAX(subject->len + length, MAX(32, subject->cap * 2));
     subject->alloc = _realloc(subject->alloc, subject->cap);
     subject->dat   = subject->alloc;
   }
