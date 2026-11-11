@@ -8,10 +8,8 @@
 
 static char chunk[CHUNK_SIZE];
 
-// Appending a block larger than double the current capacity must grow the
-// buffer to fit it, not just double the old capacity. The growth path in
-// buf_append used to compute MAX(32, cap * 2) without regard for the pending
-// append length, overflowing the allocation on every such append.
+// Regression: grow path used MAX(32, cap * 2), ignoring append length;
+// appends larger than 2x cap overran the allocation
 void test_large_append_grows_to_fit() {
   struct buf subject;
   memset(&subject, 0, sizeof subject);
@@ -30,8 +28,8 @@ void test_large_append_grows_to_fit() {
   buf_clear(&subject);
 }
 
-// Same bug via the consume path: after buf_consume, the eject step reclaims
-// head space but may still leave too little capacity, hitting the grow step.
+// After buf_consume, eject reclaims head space but can leave len + length
+// > cap, so the grow step must still size to fit the append
 void test_large_append_after_consume() {
   struct buf subject;
   memset(&subject, 0, sizeof subject);
